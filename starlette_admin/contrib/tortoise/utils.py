@@ -54,7 +54,7 @@ def add_id2fk_fields(data: dict, fields: t.Sequence[str]):
 
 def related_starlette_field(field_map_item: tuple, **kw):
     name, field = field_map_item
-    starlette_type = tortoise2starlette_admin_fields[field]
+    starlette_type = tortoise2starlette_admin_fields[type(field)]
     kwargs = {"name": name, "label": name, "required": field.required}
     if isinstance(field, ForeignKeyFieldInstance):
         kwargs.update({"identity": field.model_name.split(".")[-1]})
@@ -66,6 +66,6 @@ def related_starlette_field(field_map_item: tuple, **kw):
 
 def tortoise_fields2starlette_fields(model: t.TortoiseModel, **kwargs):
     return tuple(
-        related_starlette_field(i, kwargs.get(i[0], {}))
+        related_starlette_field(i, **kwargs.get(i[0], {}))
         for i in model._meta.fields_map.items()
     )
