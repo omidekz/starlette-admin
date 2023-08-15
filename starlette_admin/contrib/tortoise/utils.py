@@ -64,7 +64,7 @@ def related_starlette_field(field_map_item: tuple, **kw):
     return starlette_type(**kwargs)
 
 
-def tortoise_fields2starlette_fields(model: t.TortoiseBaseModel, **kwargs):
+def tortoise_fields2starlette_fields(model: t.TortoiseModel, **kwargs):
     return tuple(
         related_starlette_field(i, kwargs.get(i[0], {}))
         for i in model._meta.fields_map.items()
