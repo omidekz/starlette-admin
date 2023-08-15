@@ -7,38 +7,6 @@ from tortoise.fields.relational import (
 from tortoise import fields as tfields
 import starlette_admin.fields as fields
 
-
-def starlette_admin_order_by2tortoise_order_by(order_bys: t.OrderBy):
-    def convert(order_by: str):
-        field_part, order_part = order_by.split(" ")
-        order_by = "" if order_by == "acs" else "-"
-        return f"{order_part}{field_part}"
-
-    return tuple(map(convert, order_bys))
-
-
-def remove_nones(item: dict):
-    return {
-        k: remove_nones(v) if isinstance(v, dict) else v
-        for k, v in item.items()
-        if v is not None
-    }
-
-
-def fk_fields(repo: t.TortoiseModel):
-    return tuple(
-        k
-        for k, v in repo._meta.fields_map.items()
-        if isinstance(v, ForeignKeyFieldInstance)
-    )
-
-
-def add_id2fk_fields(data: dict, fields: t.Sequence[str]):
-    fk_fields_ = set(fields)
-    convert = lambda k: k if k not in fk_fields_ else f"{k}_id"
-    return {convert(k): v for k, v in data.items()}
-
-
 tortoise2starlette_admin_fields = {
     tfields.IntField: fields.IntegerField,
     tfields.BigIntField: fields.IntegerField,
@@ -58,6 +26,29 @@ tortoise2starlette_admin_fields = {
     tfields.TextField: fields.TinyMCEEditorField,
     tfields.TimeField: fields.TimeField,
 }
+
+
+def starlette_admin_order_by2tortoise_order_by(order_bys: t.OrderBy):
+    def convert(order_by: str):
+        field_part, order_part = order_by.split(" ")
+        order_by = "" if order_by == "acs" else "-"
+        return f"{order_part}{field_part}"
+
+    return tuple(map(convert, order_bys))
+
+
+def remove_nones(item: dict):
+    return {
+        k: remove_nones(v) if isinstance(v, dict) else v
+        for k, v in item.items()
+        if v is not None
+    }
+
+
+def add_id2fk_fields(data: dict, fields: t.Sequence[str]):
+    fk_fields_ = set(fields)
+    convert = lambda k: k if k not in fk_fields_ else f"{k}_id"
+    return {convert(k): v for k, v in data.items()}
 
 
 def related_starlette_field(field_map_item: tuple, **kw):
