@@ -26,7 +26,7 @@ class BaseModelView(starlette_admin.BaseModelView):
         return await self._find_all(request, q, where)
 
     async def _find_all(self, request, query, where: t.Where):
-        return query
+        return await query
 
     async def find_by_pk(self, request, pk: t.Pk) -> t.TortoiseModel:
         return await self.repo.get_or_none(pk=pk)
@@ -46,7 +46,7 @@ class BaseModelView(starlette_admin.BaseModelView):
         return await self._create(request, data)
 
     async def _create(self, request, data: dict):
-        return self.repo.create(**data)
+        return await self.repo.create(**data)
 
     async def delete(self, request, pks: t.Pks) -> t.Optional[int]:
         items = await self.find_by_pks(request, pks)
