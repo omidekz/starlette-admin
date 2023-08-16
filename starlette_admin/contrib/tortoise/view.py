@@ -63,7 +63,7 @@ class BaseModelView(starlette_admin.BaseModelView):
 
         class tmp(cls):
             repo = model
-            identity = model_full_name_parts[-1].lower()
+            identity = utils.identity(model._meta.full_name)
             name = model_full_name_parts[-1]
             label = f"{model_full_name_parts[-1].title()}s"
             pk_attr = model._meta.pk_attr

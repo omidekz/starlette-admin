@@ -52,15 +52,20 @@ def add_id2fk_fields(data: dict, fields: t.Sequence[str]):
     return {convert(k): v for k, v in data.items()}
 
 
+def identity(model_name: str):
+    return model_name.split(".")[-1].lower()
+
+
 def related_starlette_field(field_map_item: tuple, **kw):
     name, field = field_map_item
     starlette_type = tortoise2starlette_admin_fields[type(field)]
     kwargs = {"name": name, "label": name, "required": field.required}
-    if isinstance(field, ForeignKeyFieldInstance):
-        kwargs.update({"identity": field.model_name.split(".")[-1]})
-    elif isinstance(field, tfields.CharField):
+    field_type = type(field)
+    if field_type is ForeignKeyFieldInstance:
+        kwargs.update({"identity": identity(field.model_name)})
+    elif field_type is tfields.CharField:
         kwargs.update({"maxlength": field.max_length})
-    elif isinstance(field, tfields.DatetimeField):
+    elif field_type is tfields.DatetimeField:
         kwargs.update(
             {
                 "required": field.required
