@@ -60,6 +60,14 @@ def related_starlette_field(field_map_item: tuple, **kw):
         kwargs.update({"identity": field.model_name.split(".")[-1]})
     elif isinstance(field, tfields.CharField):
         kwargs.update({"maxlength": field.max_length})
+    elif isinstance(field, tfields.DatetimeField):
+        kwargs.update(
+            {
+                "required": field.required
+                and not field.auto_now_add
+                and not field.auto_now
+            }
+        )
     kwargs.update(kw)
     return starlette_type(**kwargs)
 
