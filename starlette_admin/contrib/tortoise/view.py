@@ -59,13 +59,14 @@ class BaseModelView(starlette_admin.BaseModelView):
 
     @classmethod
     def from_model(cls, model: t.TortoiseModel, **fields_kwarg):
-        model_full_name_parts = model._meta.full_name.split('.')
+        model_full_name_parts = model._meta.full_name.split(".")
 
         class tmp(cls):
             repo = model
             identity = model_full_name_parts[-1].lower()
             name = model_full_name_parts[-1]
             label = f"{model_full_name_parts[-1].title()}s"
+            pk_attr = model._meta.pk_attr
             fields = utils.tortoise_fields2starlette_fields(model, **fields_kwarg)
 
         return tmp
