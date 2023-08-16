@@ -32,7 +32,7 @@ tortoise2starlette_admin_fields = {
 def starlette_admin_order_by2tortoise_order_by(order_bys: t.OrderBy):
     def convert(order_by: str):
         field_part, order_part = order_by.split(" ")
-        order_by = "" if order_by == "acs" else "-"
+        order_part = "" if order_by == "acs" else "-"
         return f"{order_part}{field_part}"
 
     return tuple(map(convert, order_bys))
