@@ -57,14 +57,14 @@ def identity(model_name: str, app_name=None):
     return f"{app_name}{model_name.split('.')[-1].lower()}"
 
 
-def related_starlette_field(field_map_item: tuple, **kw):
+def related_starlette_field(field_map_item: tuple, **config):
     name, field = field_map_item
     starlette_type = tortoise2starlette_admin_fields[type(field)]
     kwargs = {"name": name, "label": name, "required": field.required}
     field_type = type(field)
     if field_type in [ForeignKeyFieldInstance, OneToOneFieldInstance] :
         kwargs.update(
-            {"identity": identity(field.model_name, kwargs.get("_app_name_"))}
+            {"identity": identity(field.model_name, config.get("_app_name_"))}
         )
     elif field_type is tfields.CharField:
         kwargs.update({"maxlength": field.max_length})
@@ -76,7 +76,7 @@ def related_starlette_field(field_map_item: tuple, **kw):
                 and not field.auto_now
             }
         )
-    kwargs.update(kw)
+    kwargs.update(config)
     if "_app_name_" in kwargs:
         kwargs.pop("_app_name_")
     return starlette_type(**kwargs)
