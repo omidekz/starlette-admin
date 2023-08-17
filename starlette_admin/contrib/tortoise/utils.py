@@ -53,8 +53,8 @@ def add_id2fk_fields(data: dict, fields: t.Sequence[str]):
 
 
 def identity(model_name: str, app_name=None):
-    app_name = app_name or ""
-    return f"{app_name}_{model_name.split('.')[-1].lower()}"
+    app_name = f"{app_name}_" if app_name else ""
+    return f"{app_name}{model_name.split('.')[-1].lower()}"
 
 
 def related_starlette_field(field_map_item: tuple, **kw):
