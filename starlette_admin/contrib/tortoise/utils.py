@@ -76,6 +76,8 @@ def related_starlette_field(field_map_item: tuple, **kw):
                 and not field.auto_now
             }
         )
+    if "_app_name_" in kwargs:
+        kwargs.pop("_app_name_")
     kwargs.update(kw)
     return starlette_type(**kwargs)
 
