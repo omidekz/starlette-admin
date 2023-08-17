@@ -63,7 +63,9 @@ def related_starlette_field(field_map_item: tuple, **kw):
     kwargs = {"name": name, "label": name, "required": field.required}
     field_type = type(field)
     if field_type is ForeignKeyFieldInstance:
-        kwargs.update({"identity": identity(field.model_name)})
+        kwargs.update(
+            {"identity": identity(field.model_name, kwargs.get("_app_name_"))}
+        )
     elif field_type is tfields.CharField:
         kwargs.update({"maxlength": field.max_length})
     elif field_type is tfields.DatetimeField:
