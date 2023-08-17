@@ -58,12 +58,12 @@ class BaseModelView(starlette_admin.BaseModelView):
         return await item.update_from_dict(data).save()
 
     @classmethod
-    def from_model(cls, model: t.TortoiseModel, **fields_kwarg):
+    def from_model(cls, model: t.TortoiseModel, *, _app_name_='',**fields_kwarg):
         model_full_name_parts = model._meta.full_name.split(".")
 
         class tmp(cls):
             repo = model
-            identity = utils.identity(model._meta.full_name)
+            identity = utils.identity(model._meta.full_name, _app_name_)
             name = model_full_name_parts[-1]
             label = f"{model_full_name_parts[-1].title()}s"
             pk_attr = model._meta.pk_attr
