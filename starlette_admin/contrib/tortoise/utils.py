@@ -62,7 +62,7 @@ def related_starlette_field(field_map_item: tuple, **kw):
     starlette_type = tortoise2starlette_admin_fields[type(field)]
     kwargs = {"name": name, "label": name, "required": field.required}
     field_type = type(field)
-    if field_type is ForeignKeyFieldInstance:
+    if field_type in [ForeignKeyFieldInstance, OneToOneFieldInstance] :
         kwargs.update(
             {"identity": identity(field.model_name, kwargs.get("_app_name_"))}
         )
@@ -76,9 +76,9 @@ def related_starlette_field(field_map_item: tuple, **kw):
                 and not field.auto_now
             }
         )
+    kwargs.update(kw)
     if "_app_name_" in kwargs:
         kwargs.pop("_app_name_")
-    kwargs.update(kw)
     return starlette_type(**kwargs)
 
 
