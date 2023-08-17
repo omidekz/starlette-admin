@@ -80,8 +80,13 @@ def related_starlette_field(field_map_item: tuple, **kw):
     return starlette_type(**kwargs)
 
 
-def tortoise_fields2starlette_fields(model: t.TortoiseModel, **kwargs):
+def tortoise_fields2starlette_fields(
+    model: t.TortoiseModel,
+    *,
+    _app_name_="",
+    **kwargs,
+):
     return tuple(
-        related_starlette_field(i, **kwargs.get(i[0], {}))
+        related_starlette_field(i, **{"_app_name_": _app_name_, **kwargs.get(i[0], {})})
         for i in model._meta.fields_map.items()
     )
