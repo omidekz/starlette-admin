@@ -59,10 +59,10 @@ def identity(model_name: str, app_name=None):
 
 def related_starlette_field(field_map_item: tuple, **config):
     name, field = field_map_item
-    starlette_type = tortoise2starlette_admin_fields[type(field)]
+    starlette_type = config.get("type") or tortoise2starlette_admin_fields[type(field)]
     kwargs = {"name": name, "label": name, "required": field.required}
     field_type = type(field)
-    if field_type in [ForeignKeyFieldInstance, OneToOneFieldInstance] :
+    if field_type in [ForeignKeyFieldInstance, OneToOneFieldInstance]:
         kwargs.update(
             {"identity": identity(field.model_name, config.get("_app_name_"))}
         )
