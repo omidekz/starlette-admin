@@ -8,7 +8,7 @@ from tortoise.fields.relational import (
 
 from . import types as t
 
-tortoise2starlette_admin_fields = {
+tortoise2starlette_admin_fields_mapper = {
     tfields.IntField: fields.IntegerField,
     tfields.BigIntField: fields.IntegerField,
     tfields.SmallIntField: fields.IntegerField,
@@ -57,29 +57,37 @@ def identity(model_name: str, app_name=None):
     return f"{app_name}{model_name.split('.')[-1].lower()}"
 
 
-def related_starlette_field(field_map_item: tuple, **config):
+def related_starlette_field(field_map_item: tuple, **configs):
     name, field = field_map_item
-    starlette_type = config.get("type") or tortoise2starlette_admin_fields[type(field)]
-    kwargs = {"name": name, "label": name, "required": field.required}
+    starlette_field_type = (
+        configs.pop("type", None) or tortoise2starlette_admin_fields_mapper[type(field)]
+    )
+    starlette_field_type_init_kwargs = {
+        "name": name,
+        "label": name,
+        "required": field.required,
+    }
     field_type = type(field)
     if field_type in [ForeignKeyFieldInstance, OneToOneFieldInstance]:
-        kwargs.update(
-            {"identity": identity(field.model_name, config.get("_app_name_"))}
+        starlette_field_type_init_kwargs.update(
+            {"identity": identity(field.model_name, configs.get("_app_name_"))}
         )
     elif field_type is tfields.CharField:
-        kwargs.update({"maxlength": field.max_length})
+        starlette_field_type_init_kwargs.update({"maxlength": field.max_length})
+    elif field_type is tfields.CharEnumField:
+        starlette_field_type_init_kwargs.update({"enum": field.enum_type})
     elif field_type is tfields.DatetimeField:
-        kwargs.update(
+        starlette_field_type_init_kwargs.update(
             {
                 "required": field.required
                 and not field.auto_now_add
                 and not field.auto_now
             }
         )
-    kwargs.update(config)
-    if "_app_name_" in kwargs:
-        kwargs.pop("_app_name_")
-    return starlette_type(**kwargs)
+    starlette_field_type_init_kwargs.update(configs)
+    if "_app_name_" in starlette_field_type_init_kwargs:
+        starlette_field_type_init_kwargs.pop("_app_name_")
+    return starlette_field_type(**starlette_field_type_init_kwargs)
 
 
 def tortoise_fields2starlette_fields(
